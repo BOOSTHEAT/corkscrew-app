@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludePrivateDependenciesInNupkg</TargetsForTfmSpecificBuildOutput>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="ImpliciX.Language" Version="*"/>
+        <None Update="appsettings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Pack>true</Pack>
+            <PackageCopyToOutput>true</PackageCopyToOutput>
+        </None>
+        <EmbeddedResource Include="Assets\*"/>
+    </ItemGroup>
+    
+    <Target Name="IncludePrivateDependenciesInNupkg">
+        <ItemGroup>
+            <BuildOutputInPackage Include="$(OutputPath)*.dll" Exclude="$(TargetPath)" />
+        </ItemGroup>
+    </Target>
+    
+</Project>

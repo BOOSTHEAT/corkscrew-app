@@ -1,0 +1,69 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Corkscrew.App", "Corkscrew.App\Corkscrew.App.csproj", "{0300B371-058F-426A-AADB-BC63699A9E5B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MiscFiles", "MiscFiles", "{C7B7DD10-8A8B-4F33-95E0-07CDA48C3010}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		NuGet.Config = NuGet.Config
+		app_nupkg_pipeline.yml = app_nupkg_pipeline.yml
+		language-tag-template.yml = language-tag-template.yml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Corkscrew.Run", "Corkscrew.Run\Corkscrew.Run.csproj", "{9B9C65B2-C8FD-4A3D-AFA1-71F3A2D3FAEF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "bootstrap", "bootstrap", "{9C4E4E37-2150-46E7-B1AD-E6D291731EA6}"
+	ProjectSection(SolutionItems) = preProject
+		bootstrap\app_build_template.yml = bootstrap\app_build_template.yml
+		bootstrap\gui_build_template.yml = bootstrap\gui_build_template.yml
+		bootstrap\authorized_keys = bootstrap\authorized_keys
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "mmi", "mmi", "{F704D217-91C9-4E8D-92A4-532162E35795}"
+	ProjectSection(SolutionItems) = preProject
+		bootstrap\mmi\pipeline.yml = bootstrap\mmi\pipeline.yml
+		bootstrap\mmi\image.yml = bootstrap\mmi\image.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "includes", "includes", "{03DDAADA-BF6B-44D6-8066-FB4FDBF005C8}"
+	ProjectSection(SolutionItems) = preProject
+		bootstrap\mmi\includes\implicix_app.env = bootstrap\mmi\includes\implicix_app.env
+		bootstrap\mmi\includes\initialize.sh = bootstrap\mmi\includes\initialize.sh
+		bootstrap\mmi\includes\profile = bootstrap\mmi\includes\profile
+		bootstrap\mmi\includes\wpa_supplicant.conf = bootstrap\mmi\includes\wpa_supplicant.conf
+		bootstrap\mmi\includes\empty = bootstrap\mmi\includes\empty
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "bonus", "bonus", "{B52AAE50-A5EE-41F7-8D2E-84BE7AA678A8}"
+	ProjectSection(SolutionItems) = preProject
+		bootstrap\mmi\bonus\index.json = bootstrap\mmi\bonus\index.json
+		bootstrap\mmi\bonus\remote_MMI_reset.sh = bootstrap\mmi\bonus\remote_MMI_reset.sh
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Corkscrew.GenGui", "Corkscrew.GenGui\Corkscrew.GenGui.csproj", "{722FADCF-29DF-4C59-B81A-A50CAAC9848B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0300B371-058F-426A-AADB-BC63699A9E5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0300B371-058F-426A-AADB-BC63699A9E5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0300B371-058F-426A-AADB-BC63699A9E5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0300B371-058F-426A-AADB-BC63699A9E5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B9C65B2-C8FD-4A3D-AFA1-71F3A2D3FAEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B9C65B2-C8FD-4A3D-AFA1-71F3A2D3FAEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B9C65B2-C8FD-4A3D-AFA1-71F3A2D3FAEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B9C65B2-C8FD-4A3D-AFA1-71F3A2D3FAEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{722FADCF-29DF-4C59-B81A-A50CAAC9848B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{722FADCF-29DF-4C59-B81A-A50CAAC9848B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{722FADCF-29DF-4C59-B81A-A50CAAC9848B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{722FADCF-29DF-4C59-B81A-A50CAAC9848B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F704D217-91C9-4E8D-92A4-532162E35795} = {9C4E4E37-2150-46E7-B1AD-E6D291731EA6}
+		{03DDAADA-BF6B-44D6-8066-FB4FDBF005C8} = {F704D217-91C9-4E8D-92A4-532162E35795}
+		{B52AAE50-A5EE-41F7-8D2E-84BE7AA678A8} = {F704D217-91C9-4E8D-92A4-532162E35795}
+	EndGlobalSection
+EndGlobal

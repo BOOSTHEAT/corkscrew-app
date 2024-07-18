@@ -1,0 +1,41 @@
+parameters:
+  - name: targetArchitecture
+    type: string
+
+jobs:
+  - job: BuildApp
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+      - task: UseDotNet@2
+        displayName: 'Install .net 8.0'
+        inputs:
+          packageType: sdk
+          version: '8.0.x'
+          installationPath: $(Agent.ToolsDirectory)/dotnet
+
+      - task: NuGetAuthenticate@0
+
+      - download: LINKER
+        artifact: device_linker
+
+      - bash: |
+          set -x
+          linker="${PIPELINE_WORKSPACE}/LINKER/device_linker/ImpliciX.Linker/src/ImpliciX.Linker"
+          chmod +x $linker
+          $linker build \
+            -s https://pkgs.dev.azure.com/boostheat/_packaging/ImpliciX/nuget/v3/index.json \
+            -n ImpliciX.Runtime \
+            -n ImpliciX.Corkscrew \
+            -e Corkscrew.App.Main \
+            -t ${{ parameters.targetArchitecture }} \
+            -v ${BUILD_BUILDNUMBER} \
+            -o "${BUILD_ARTIFACTSTAGINGDIRECTORY}/app.zip"
+        displayName: Builds app
+
+      - template: ../language-tag-template.yml
+        
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          artifactName: App

@@ -1,0 +1,60 @@
+parameters:
+  - name: targetArchitecture
+    type: string
+
+jobs:
+  - job: BuildGui
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+      - task: UseDotNet@2
+        displayName: 'Install .net 8.0'
+        inputs:
+          packageType: sdk
+          version: '8.0.x'
+          installationPath: $(Agent.ToolsDirectory)/dotnet
+
+      - task: NuGetAuthenticate@0
+
+      - download: LINKER
+        artifact: device_linker
+
+      - bash: |
+          set -x
+          linker="${PIPELINE_WORKSPACE}/LINKER/device_linker/ImpliciX.Linker/src/ImpliciX.Linker"
+          chmod +x $linker
+          $linker qml \
+            -s https://pkgs.dev.azure.com/boostheat/_packaging/ImpliciX/nuget/v3/index.json \
+            -n ImpliciX.Corkscrew \
+            -e Corkscrew.App.Main \
+            -v ${BUILD_BUILDNUMBER} \
+            -o "${PIPELINE_WORKSPACE}/QML/${BUILD_BUILDNUMBER}"
+        displayName: Generates GUI project
+        
+      - template: ../language-tag-template.yml
+
+      - download: BSP
+        artifact: BSP
+        patterns: '**/*.sh'
+
+# to be replaced by docker Qt cross compilation
+      - bash: |
+          echo 'y'|sh "${PIPELINE_WORKSPACE}/BSP/BSP/boostheat-fb-glibc-x86_64-Boostheat_generate_sdk-armv7at2hf-neon-colibri-imx7-emmc-toolchain-5.0.0.sh" -d yocto-sdk
+          . yocto-sdk/environment-setup-armv7at2hf-neon-tdx-linux-gnueabi
+          
+          QML_FOLDER="${PIPELINE_WORKSPACE}/QML/${BUILD_BUILDNUMBER}"
+          cd ${QML_FOLDER}
+          GUI_EXE_NAME=$(cat "./main.pro" | grep "TARGET = " | cut -d' ' -f3)
+          rm -rf build_arm
+          mkdir -p build_arm
+          qmake -o build_arm/Makefile
+          make -C build_arm
+          
+          mkdir -p $(Build.ArtifactStagingDirectory)/gui_output
+          cp build_arm/$GUI_EXE_NAME $(Build.ArtifactStagingDirectory)
+        displayName: Build GUI
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          artifactName: Gui

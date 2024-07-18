@@ -1,0 +1,82 @@
+
+jobs:
+  - job: MmiImage
+    dependsOn:
+      - BuildApp
+      - BuildGui
+    pool:
+      vmImage: 'ubuntu-latest'
+    
+    steps:
+
+      - task: DownloadBuildArtifacts@0
+        displayName: 'Download App Artifact'
+        inputs:
+          artifactName: App
+          downloadPath: $(Build.SourcesDirectory)
+
+      - task: DownloadBuildArtifacts@0
+        displayName: 'Download Gui Artifact'
+        inputs:
+          artifactName: Gui
+          downloadPath: $(Build.SourcesDirectory)
+
+      - download: LINKER
+        artifact: device_linker
+        
+      - bash: |
+          set -x
+          chmod +x ${BUILD_SOURCESDIRECTORY}/Gui/ImpliciX.GUI
+          linker="${PIPELINE_WORKSPACE}/LINKER/device_linker/ImpliciX.Linker/src/ImpliciX.Linker"
+          chmod +x $linker
+          $linker pack \
+            -n Corkscrew \
+            -v ${BUILD_BUILDNUMBER} \
+            -o ${BUILD_SOURCESDIRECTORY}/CorkscrewPackage.zip \
+            -p device:app,${BUILD_BUILDNUMBER},${BUILD_SOURCESDIRECTORY}/App/app.zip \
+            -p device:gui,${BUILD_BUILDNUMBER},${BUILD_SOURCESDIRECTORY}/Gui/ImpliciX.GUI
+        displayName: Create package
+        
+      - download: BSP
+        artifact: BSP
+        patterns: '**/*.tar'
+
+      - bash: |
+          set -x
+          BONUS=${BUILD_SOURCESDIRECTORY}/bootstrap/mmi/bonus
+          cp ${BONUS}/index.json \
+             ${BONUS}/remote_MMI_reset.sh \
+             ${BUILD_SOURCESDIRECTORY}/bootstrap/authorized_keys \
+             ${BUILD_ARTIFACTSTAGINGDIRECTORY}
+          chmod +x ${BUILD_ARTIFACTSTAGINGDIRECTORY}/remote_MMI_reset.sh
+          INCLUDES=${BUILD_SOURCESDIRECTORY}/bootstrap/mmi/includes
+          TEZI=$(ls -1 ${PIPELINE_WORKSPACE}/BSP/BSP/Colibri-iMX7-eMMC_Boostheat_image-Tezi*.tar)
+          tar xvf "${TEZI}" -C "${BUILD_SOURCESDIRECTORY}"
+          mv ${BUILD_SOURCESDIRECTORY}/Colibri*/* ${BUILD_ARTIFACTSTAGINGDIRECTORY}
+          linker="${PIPELINE_WORKSPACE}/LINKER/device_linker/ImpliciX.Linker/src/ImpliciX.Linker"
+          chmod +x $linker
+          $linker datafs                                                                         \
+            -p ${BUILD_SOURCESDIRECTORY}/CorkscrewPackage.zip                                    \
+            -d /opt/slot/bootfs.0                                                                \
+            -d /opt/slot/bootfs.1                                                                \
+            -d /opt/factory/setup                                                                \
+            -l /opt/slot/bootfs.1,/opt/slot/bootfs.0/other                                       \
+            -l /opt/slot/bootfs.0,/opt/slot/bootfs.1/other                                       \
+            -e device:app,/opt/factory/software/app                                              \
+            -e device:gui,/opt/factory/software/gui                                              \
+            -f ${INCLUDES}/profile,/home/root/.profile                                           \
+            -f ${INCLUDES}/empty,/home/root/.ssh/authorized_keys                                 \
+            -f ${INCLUDES}/wpa_supplicant.conf,/var/lib/network/wpa_supplicant.conf              \
+            -f ${INCLUDES}/implicix_app.env,/var/lib/implicix_app/implicix_app.env               \
+            -f ${INCLUDES}/initialize.sh,/var/lib/implicix_app/initialize.sh                     \
+            -f ${INCLUDES}/empty,/opt/software/app/readme.txt                                    \
+            -f ${INCLUDES}/empty,/opt/software/gui/readme.txt                                    \
+            -o ${BUILD_ARTIFACTSTAGINGDIRECTORY}/Boostheat_image-colibri-imx7-emmc-data.tar.gz   \
+            -i ${BUILD_ARTIFACTSTAGINGDIRECTORY}/image.json
+        displayName: Create datafs
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathtoPublish: $(Build.ArtifactStagingDirectory)
+          artifactName: MMI
+        displayName: Publish MMI image

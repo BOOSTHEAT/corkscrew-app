@@ -1,0 +1,39 @@
+name: $(Year:yyyy).$(Month).$(DayOfMonth).$(Rev:r)
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - bootstrap/mmi/*
+
+resources:
+  pipelines:
+    - pipeline: LINKER
+      project: ImpliciX
+      source: linker
+      trigger: true
+    - pipeline: APP
+      project: ImpliciX
+      source: corkscrew-app
+      trigger: true
+    - pipeline: RUNTIME
+      project: ImpliciX
+      source: runtime
+    - pipeline: BSP
+      project: ImpliciX
+      source: mmi2-meta-boostheat
+      trigger: true
+
+jobs:
+
+  - template: ../app_build_template.yml
+    parameters:
+      targetArchitecture: linux-arm
+
+  - template: ../gui_build_template.yml
+    parameters:
+      targetArchitecture: linux-arm
+
+  - template: image.yml
+
